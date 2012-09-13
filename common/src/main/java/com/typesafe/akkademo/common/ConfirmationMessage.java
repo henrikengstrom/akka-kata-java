@@ -1,0 +1,16 @@
+/**
+ *  Copyright (C) 2011-2012 Typesafe, Inc <http://typesafe.com>
+ */
+package com.typesafe.akkademo.common;
+
+public class ConfirmationMessage {
+    private final int id;
+
+    public ConfirmationMessage(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+}
