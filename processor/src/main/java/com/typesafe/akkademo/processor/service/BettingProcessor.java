@@ -19,10 +19,10 @@ import com.typesafe.akkademo.processor.repository.DatabaseFailureException;
 import java.util.concurrent.TimeUnit;
 
 public class BettingProcessor extends UntypedActor {
-    LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-    Cancellable heartbeat;
-    ActorRef service;
-    ActorRef worker;
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private Cancellable heartbeat;
+    private ActorRef service;
+    private ActorRef worker;
 
     public BettingProcessor() {
         service = context().actorFor(context().system().settings().config().getString("betting-service-actor"));

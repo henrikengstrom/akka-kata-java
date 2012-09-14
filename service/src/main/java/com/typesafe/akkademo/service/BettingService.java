@@ -3,34 +3,99 @@
  */
 package com.typesafe.akkademo.service;
 
-import akka.actor.Actor;
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import com.typesafe.akkademo.common.Bet;
-import com.typesafe.akkademo.common.RetrieveBets;
+import akka.util.FiniteDuration;
+import com.typesafe.akkademo.common.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class BettingService extends UntypedActor {
     LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private int sequence = 1;
+    private ActorRef processor;
+    private long lastUpdate = 0L;
+    private static final long ACTIVE_PERIOD = 2000L;
+    // Note: To make this solution (even) more bullet proof you would have to persist the incoming bets.
+    private Map<Integer, Bet> bets = new HashMap<Integer, Bet>();
+    private Cancellable scheduler;
 
-    /**
-     * TASKS:
-     * Create unique sequence/transaction number
-     * Create PlayerBet and call betting processor (remotely)
-     * Retrieve all bets from betting processor (remotely)
-     * Handle timed out transactions (scheduler)
-     * Handle registration message from betting processor
-     * Handle crash of/unavailable betting processor
-     * Keep any message locally until there is a processor service available
-     */
+    public BettingService() {
+        scheduler = context().system().scheduler().schedule(new FiniteDuration(5, TimeUnit.SECONDS), new FiniteDuration(2, TimeUnit.SECONDS), getSelf(), new UnhandledBets());
+    }
+
+    @Override
+    public void postStop() {
+        scheduler.cancel();
+    }
 
     public void onReceive(Object message) {
         if (message instanceof Bet) {
-            // todo
+            PlayerBet playerBet = processBet((Bet) message);
+            ActorRef p = getActiveProcessor();
+            if (p != null) p.tell(playerBet);
+        } else if (message instanceof ConfirmationMessage) {
+            handleProcessedBet(((ConfirmationMessage) message).getId());
         } else if (message instanceof RetrieveBets) {
-            // todo
+            ActorRef p = getActiveProcessor();
+            if (p != null) p.forward((RetrieveBets) message, context());
+        } else if (message instanceof UnhandledBets) {
+            handleUnprocessedBets();
+        } else if (message instanceof RegisterProcessor) {
+            registerProcessor(getSender());
         } else {
             unhandled(message);
+        }
+        // In the upcoming clustering we will be able to listen to remote clients and their status.
+        // With this it will be possible to prevent sending messages to a client that is no longer available.
+        // e.g. case RemoteClientDead (or similar) => processor = None
+        // In this solution we use heartbeats instead.
+    }
+
+    private PlayerBet processBet(Bet bet) {
+        sequence += 1;
+        int id = sequence;
+        bets.put(id, bet);
+        return new PlayerBet(id, bet);
+    }
+
+    private void handleProcessedBet(int id) {
+        bets.remove(id);
+    }
+
+    private void registerProcessor(ActorRef processor) {
+        this.processor = processor;
+        lastUpdate = System.currentTimeMillis();
+    }
+
+    private ActorRef getActiveProcessor() {
+        if ((System.currentTimeMillis() - lastUpdate) < ACTIVE_PERIOD)  {
+           return processor;
+        }
+
+        return null;
+    }
+
+    private void handleUnprocessedBets() {
+        // In a real world solution you should probably timestamp each message sent so that you do not
+        // resend just sent messages -> takes some pressure off the processor.
+
+        // Since this is just a demo we'll just treat all messages in the map as unhandled and resend them all.
+        // Please make sure you understand that I can do this since the processor repository is idempotent!
+
+        // To not flood the processor actor system you might want to use throttling. A good blog post about this van be found here:
+        // http://letitcrash.com/post/28901663062/throttling-messages-in-akka-2
+
+        ActorRef p = getActiveProcessor();
+        if (p != null) {
+            for (Integer key : bets.keySet()) {
+                p.tell(bets.get(key));
+            }
         }
     }
 }
