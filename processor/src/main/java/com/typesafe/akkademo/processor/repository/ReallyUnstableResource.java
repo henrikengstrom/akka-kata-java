@@ -3,25 +3,39 @@
  */
 package com.typesafe.akkademo.processor.repository;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.Files;
 import com.typesafe.akkademo.common.Bet;
+import com.typesafe.akkademo.common.PlayerBet;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
 
 public class ReallyUnstableResource implements UnstableResource {
     HashMap<Integer, Bet> bets = new HashMap<Integer, Bet>();
     File store = new File("persistent_store");
     Random randomizer = new Random();
+    final Splitter splitter = Splitter.on(":");
 
     public ReallyUnstableResource() {
         init();
     }
 
     private void init() {
-        // TODO (HE): LOAD FILE CONTENT
+        try {
+            Iterator<String> lines = Files.readLines(store, Charsets.UTF_8).iterator();
+            while (lines.hasNext()) {
+                PlayerBet playerBet = deserialize(lines.next());
+                if (!bets.containsKey(playerBet.getId())) {
+                    bets.put(playerBet.getId(), playerBet.getBet());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -31,13 +45,30 @@ public class ReallyUnstableResource implements UnstableResource {
         if (idempotentId % (randomizer.nextInt(121) + 50) == 0) System.exit(1);
 
         if (!bets.containsKey(idempotentId)) {
-            bets.put(idempotentId, new Bet(player, game, amount));
-            // TODO (HE): ADD TO FILE
+            persist(idempotentId, new Bet(player, game, amount));
         }
     }
 
     @Override
     public List<Bet> findAll() {
         return new ArrayList<Bet>(bets.values());
+    }
+
+    private PlayerBet deserialize(String line) {
+        ImmutableList<String> pieces = ImmutableList.copyOf(splitter.split(line));
+        return new PlayerBet(Integer.valueOf(pieces.get(0)), new Bet(pieces.get(1), Integer.valueOf(pieces.get(2)), Integer.valueOf(pieces.get(3))));
+    }
+
+    private String serialize(int id, Bet bet) {
+        return id + ":" + bet.getPlayer() + ":" + bet.getGame() + ":" + bet.getAmount();
+    }
+
+    private void persist(int id, Bet bet) {
+        bets.put(id, bet);
+        try {
+            Files.write(serialize(id, bet), store, Charsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

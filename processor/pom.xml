@@ -31,6 +31,10 @@
       <artifactId>akka-remote</artifactId>
       <version>${akka.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>13.0.1</version>
+    </dependency>
   </dependencies>
-
 </project>
