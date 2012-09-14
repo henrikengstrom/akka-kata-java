@@ -3,7 +3,7 @@
  */
 package com.typesafe.akkademo.processor.repository;
 
-class DatabaseFailureException extends RuntimeException {
+public class DatabaseFailureException extends RuntimeException {
     DatabaseFailureException(String s) {
         super(s);
     }
