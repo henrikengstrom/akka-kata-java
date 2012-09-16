@@ -3,5 +3,7 @@
  */
 package com.typesafe.akkademo.common;
 
-public class RetrieveBets {
+import java.io.Serializable;
+
+public class RetrieveBets implements Serializable {
 }
