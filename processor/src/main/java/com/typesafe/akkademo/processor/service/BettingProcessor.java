@@ -27,12 +27,12 @@ public class BettingProcessor extends UntypedActor {
     public BettingProcessor() {
         service = context().actorFor(context().system().settings().config().getString("betting-service-actor"));
         worker = context().actorOf(new Props(ProcessorWorker.class), "theWorker");
-        heartbeat = context().system().scheduler().schedule(Duration.Zero(), new FiniteDuration(1, TimeUnit.SECONDS), service, new RegisterProcessor());
-    }
+        heartbeat = context().system().scheduler().schedule(
+                Duration.Zero(),
+                new FiniteDuration(2, TimeUnit.SECONDS),
+                getSelf(),
+                new RegisterProcessor());
 
-    @Override
-    public SupervisorStrategy supervisorStrategy() {
-        return strategy;
     }
 
     @Override
@@ -40,16 +40,9 @@ public class BettingProcessor extends UntypedActor {
         heartbeat.cancel();
     }
 
-    public void onReceive(Object message) {
-        if (message instanceof PlayerBet) {
-            worker.forward((PlayerBet) message, context());
-        } else if (message instanceof RetrieveBets) {
-            worker.forward((RetrieveBets) message, context());
-        } else if (message instanceof RegisterProcessor) {
-            service.tell((RegisterProcessor) message);
-        } else {
-            unhandled(message);
-        }
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
+        return strategy;
     }
 
     /**
@@ -68,4 +61,17 @@ public class BettingProcessor extends UntypedActor {
                     }
                 }
             });
+
+    public void onReceive(Object message) {
+        if (message instanceof PlayerBet) {
+            PlayerBet playerBet = (PlayerBet) message;
+            worker.tell(playerBet, getSender());
+        } else if (message instanceof RetrieveBets) {
+            worker.tell((RetrieveBets) message, getSender());
+        } else if (message instanceof RegisterProcessor) {
+            service.tell((RegisterProcessor) message, getSelf());
+        } else {
+            unhandled(message);
+        }
+    }
 }

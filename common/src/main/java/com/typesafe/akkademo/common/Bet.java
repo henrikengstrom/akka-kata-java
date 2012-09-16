@@ -3,7 +3,9 @@
  */
 package com.typesafe.akkademo.common;
 
-public class Bet {
+import java.io.Serializable;
+
+public class Bet implements Serializable {
     private final String player;
     private final int game;
     private final int amount;

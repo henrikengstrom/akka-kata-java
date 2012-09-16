@@ -3,5 +3,7 @@
  */
 package com.typesafe.akkademo.common;
 
-public class RegisterProcessor {
+import java.io.Serializable;
+
+public class RegisterProcessor implements Serializable {
 }

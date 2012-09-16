@@ -20,13 +20,13 @@ public class BettingService extends UntypedActor {
     private int sequence = 1;
     private ActorRef processor;
     private long lastUpdate = 0L;
-    private static final long ACTIVE_PERIOD = 2000L;
+    private static final long ACTIVE_PERIOD = 5000L;
     // Note: To make this solution (even) more bullet proof you would have to persist the incoming bets.
     private Map<Integer, Bet> bets = new HashMap<Integer, Bet>();
     private Cancellable scheduler;
 
     public BettingService() {
-        scheduler = context().system().scheduler().schedule(new FiniteDuration(5, TimeUnit.SECONDS), new FiniteDuration(2, TimeUnit.SECONDS), getSelf(), new UnhandledBets());
+        scheduler = context().system().scheduler().schedule(new FiniteDuration(5, TimeUnit.SECONDS), new FiniteDuration(3, TimeUnit.SECONDS), getSelf(), new UnhandledBets());
     }
 
     @Override
@@ -38,12 +38,14 @@ public class BettingService extends UntypedActor {
         if (message instanceof Bet) {
             PlayerBet playerBet = processBet((Bet) message);
             ActorRef p = getActiveProcessor();
-            if (p != null) p.tell(playerBet);
+            if (p != null) {
+                p.tell(playerBet, getSelf());
+            }
         } else if (message instanceof ConfirmationMessage) {
             handleProcessedBet(((ConfirmationMessage) message).getId());
         } else if (message instanceof RetrieveBets) {
             ActorRef p = getActiveProcessor();
-            if (p != null) p.forward((RetrieveBets) message, context());
+            if (p != null) p.tell((RetrieveBets) message, getSender());
         } else if (message instanceof UnhandledBets) {
             handleUnprocessedBets();
         } else if (message instanceof RegisterProcessor) {
@@ -65,6 +67,7 @@ public class BettingService extends UntypedActor {
     }
 
     private void handleProcessedBet(int id) {
+        log.info("processed bet: " + id);
         bets.remove(id);
     }
 
@@ -91,10 +94,11 @@ public class BettingService extends UntypedActor {
         // To not flood the processor actor system you might want to use throttling. A good blog post about this van be found here:
         // http://letitcrash.com/post/28901663062/throttling-messages-in-akka-2
 
+        log.info("handling unprocessed bets (size): " + bets.size());
         ActorRef p = getActiveProcessor();
         if (p != null) {
             for (Integer key : bets.keySet()) {
-                p.tell(bets.get(key));
+                p.tell(new PlayerBet(key, bets.get(key)), getSelf());
             }
         }
     }

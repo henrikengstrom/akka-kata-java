@@ -3,7 +3,9 @@
  */
 package com.typesafe.akkademo.common;
 
-public class ConfirmationMessage {
+import java.io.Serializable;
+
+public class ConfirmationMessage implements Serializable {
     private final int id;
 
     public ConfirmationMessage(int id) {

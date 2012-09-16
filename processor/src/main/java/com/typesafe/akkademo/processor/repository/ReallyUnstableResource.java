@@ -11,6 +11,7 @@ import com.typesafe.akkademo.common.Bet;
 import com.typesafe.akkademo.common.PlayerBet;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -34,7 +35,6 @@ public class ReallyUnstableResource implements UnstableResource {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -60,13 +60,13 @@ public class ReallyUnstableResource implements UnstableResource {
     }
 
     private String serialize(int id, Bet bet) {
-        return id + ":" + bet.getPlayer() + ":" + bet.getGame() + ":" + bet.getAmount();
+        return id + ":" + bet.getPlayer() + ":" + bet.getGame() + ":" + bet.getAmount() + "\n";
     }
 
     private void persist(int id, Bet bet) {
         bets.put(id, bet);
         try {
-            Files.write(serialize(id, bet), store, Charsets.UTF_8);
+            Files.append(serialize(id, bet), store, Charsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
