@@ -125,9 +125,12 @@ To schedule a message send sometime in the future, once or repeatedly use the sc
 See [Scheduler](http://doc.akka.io/docs/akka/2.0.3/java/scheduler.html)
 
 ```
+import akka.util.Duration;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 Cancallable heartbeat = getContext().system().scheduler().schedule(
     Duration.Zero(),
-    new FiniteDuration(2, TimeUnit.SECONDS),
+    Duration.create(2, SECONDS),
     myActor,
     "Every other second message");
 
