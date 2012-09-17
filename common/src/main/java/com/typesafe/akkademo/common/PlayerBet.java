@@ -5,11 +5,11 @@ package com.typesafe.akkademo.common;
 
 import java.io.Serializable;
 
-public class PlayerBet {
+public class PlayerBet implements Serializable {
     private final int id;
     private final Bet bet;
 
-    public PlayerBet(int id, Bet bet) implements Serializable
+    public PlayerBet(int id, Bet bet)
 
     {
         this.id = id;
