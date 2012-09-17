@@ -5,18 +5,23 @@ package com.typesafe.akkademo.processor.service;
 
 import static akka.actor.SupervisorStrategy.*;
 
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.actor.UntypedActor;
+import akka.actor.SupervisorStrategy;
+import akka.actor.OneForOneStrategy;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import akka.util.Duration;
-import akka.util.FiniteDuration;
+
 import com.typesafe.akkademo.common.PlayerBet;
 import com.typesafe.akkademo.common.RegisterProcessor;
 import com.typesafe.akkademo.common.RetrieveBets;
 import com.typesafe.akkademo.processor.repository.DatabaseFailureException;
 
-import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class BettingProcessor extends UntypedActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
@@ -29,7 +34,7 @@ public class BettingProcessor extends UntypedActor {
         worker = getContext().actorOf(new Props(ProcessorWorker.class), "theWorker");
         heartbeat = getContext().system().scheduler().schedule(
                 Duration.Zero(),
-                new FiniteDuration(2, TimeUnit.SECONDS),
+                Duration.create(2, SECONDS),
                 getSelf(),
                 new RegisterProcessor());
 
