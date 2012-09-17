@@ -46,7 +46,7 @@ ActorRef myActor = system.actorOf(new Props(MyActor.class), "myActorName");
 In the actor context, called children (i.e. when you're inside an actor)
 
 ```
-ActorRef myActor = context().actorOf(new Props(MyActor.class), "myActorName");
+ActorRef myActor = getContext().actorOf(new Props(MyActor.class), "myActorName");
 ```
 
 **Sending messages**
