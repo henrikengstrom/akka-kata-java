@@ -21,12 +21,13 @@ public class BettingService extends UntypedActor {
     private ActorRef processor;
     private long lastUpdate = 0L;
     private static final long ACTIVE_PERIOD = 5000L;
+    private final String HANDLE_UNPROCESSED_BETS = "unhandledBets";
+    private Cancellable scheduler;
     // Note: To make this solution (even) more bullet proof you would have to persist the incoming bets.
     private Map<Integer, Bet> bets = new HashMap<Integer, Bet>();
-    private Cancellable scheduler;
 
     public BettingService() {
-        scheduler = context().system().scheduler().schedule(new FiniteDuration(5, TimeUnit.SECONDS), new FiniteDuration(3, TimeUnit.SECONDS), getSelf(), new UnhandledBets());
+        scheduler = getContext().system().scheduler().schedule(new FiniteDuration(5, TimeUnit.SECONDS), new FiniteDuration(3, TimeUnit.SECONDS), getSelf(), HANDLE_UNPROCESSED_BETS);
     }
 
     @Override
@@ -46,8 +47,10 @@ public class BettingService extends UntypedActor {
         } else if (message instanceof RetrieveBets) {
             ActorRef p = getActiveProcessor();
             if (p != null) p.tell((RetrieveBets) message, getSender());
-        } else if (message instanceof UnhandledBets) {
-            handleUnprocessedBets();
+        } else if (message instanceof String) {
+            if (((String) message).equals(HANDLE_UNPROCESSED_BETS) {
+                handleUnprocessedBets();
+            }
         } else if (message instanceof RegisterProcessor) {
             registerProcessor(getSender());
         } else {

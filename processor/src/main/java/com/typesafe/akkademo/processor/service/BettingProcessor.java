@@ -25,9 +25,9 @@ public class BettingProcessor extends UntypedActor {
     private ActorRef worker;
 
     public BettingProcessor() {
-        service = context().actorFor(context().system().settings().config().getString("betting-service-actor"));
-        worker = context().actorOf(new Props(ProcessorWorker.class), "theWorker");
-        heartbeat = context().system().scheduler().schedule(
+        service = getContext().actorFor(getContext().system().settings().config().getString("betting-service-actor"));
+        worker = getContext().actorOf(new Props(ProcessorWorker.class), "theWorker");
+        heartbeat = getContext().system().scheduler().schedule(
                 Duration.Zero(),
                 new FiniteDuration(2, TimeUnit.SECONDS),
                 getSelf(),

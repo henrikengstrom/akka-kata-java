@@ -46,7 +46,7 @@ ActorRef myActor = system.actorOf(new Props(MyActor.class), "myActorName");
 In the actor context, called children (i.e. when you're inside an actor)
 
 ```
-ActorRef myActor = context().actorOf(new Props(MyActor.class), "myActorName");
+ActorRef myActor = getContext().actorOf(new Props(MyActor.class), "myActorName");
 ```
 
 **Sending messages**
@@ -125,7 +125,7 @@ To schedule a message send sometime in the future, once or repeatedly use the sc
 See [Scheduler](http://doc.akka.io/docs/akka/2.0.3/java/scheduler.html)
 
 ```
-Cancallable heartbeat = context().system().scheduler().schedule(
+Cancallable heartbeat = getContext().system().scheduler().schedule(
     Duration.Zero(),
     new FiniteDuration(2, TimeUnit.SECONDS),
     myActor,
