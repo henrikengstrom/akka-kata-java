@@ -73,6 +73,36 @@ We will provide some alternative implementations to show how to solve the differ
 
 You should run the service, processor and client in that order to make sure that this kata runs as intended.
 
+Start the service
+
+```
+> cd <project_home>/service
+> mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.service.BettingServiceApplication"
+```
+
+The next step is to start the processor
+
+```
+> cd <project_home>/processor
+> mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.service.BettingProcessorApplication"
+```
+
+Finally you should run the client. Start off by sending bets to the service
+
+```
+> cd <project_home>/client
+> mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.client.BetClient" -Dexec.args="send"
+```
+
+The final step is to retrieve the bets from the service
+
+```
+> cd <project_home>/client
+> mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.client.BetClient"
+```
+
+That's it!
+
 ## Green Belt Akka
 
 For a small collection of akka information useful for this kata see [Green Belt Akka](https://github.com/henrikengstrom/akka-kata-java/blob/master/GREEN_BELT_AKKA.md)
