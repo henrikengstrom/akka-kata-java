@@ -21,6 +21,7 @@ import com.typesafe.akkademo.common.RegisterProcessor;
 import com.typesafe.akkademo.common.RetrieveBets;
 import com.typesafe.akkademo.processor.repository.DatabaseFailureException;
 
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class BettingProcessor extends UntypedActor {
@@ -37,7 +38,6 @@ public class BettingProcessor extends UntypedActor {
                 Duration.create(2, SECONDS),
                 getSelf(),
                 new RegisterProcessor());
-
     }
 
     @Override
