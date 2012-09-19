@@ -107,6 +107,10 @@ That's it!
 
 For a small collection of akka information useful for this kata see [Green Belt Akka](https://github.com/henrikengstrom/akka-kata-java/blob/master/GREEN_BELT_AKKA.md)
 
+## Solution Proposal
+
+When you feel that you have accomplished all tasks specified in the code there is a solution proposal to be found in a branch called [solution](http://github.com/henrikengstrom/akka-kata-java/tree/solution). We recommend that you try to solve the kata before  looking at this proposal though. 
+
 ## Authors
 
 * Henrik Engström : [@h3nk3](http://twitter.com/h3nk3)
