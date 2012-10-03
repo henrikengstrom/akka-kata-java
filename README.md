@@ -84,7 +84,7 @@ The next step is to start the processor
 
 ```
 > cd <project_home>/processor
-> mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.service.BettingProcessorApplication"
+> mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.processor.BettingProcessorApplication"
 ```
 
 Finally you should run the client. Start off by sending bets to the service
