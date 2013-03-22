@@ -1,9 +1,11 @@
 /**
- *  Copyright (C) 2011-2012 Typesafe <http://typesafe.com/>
+ *  Copyright (C) 2011-2013 Typesafe <http://typesafe.com/>
  */
 package com.typesafe.akkademo.processor.service;
 
-import static akka.actor.SupervisorStrategy.*;
+import static akka.actor.SupervisorStrategy.Directive;
+import static akka.actor.SupervisorStrategy.escalate;
+import static akka.actor.SupervisorStrategy.restart;
 
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
@@ -14,7 +16,7 @@ import akka.actor.OneForOneStrategy;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
-import akka.util.Duration;
+import scala.concurrent.duration.Duration;
 
 import com.typesafe.akkademo.common.PlayerBet;
 import com.typesafe.akkademo.common.RegisterProcessor;
@@ -37,7 +39,8 @@ public class BettingProcessor extends UntypedActor {
                 Duration.Zero(),
                 Duration.create(2, SECONDS),
                 getSelf(),
-                new RegisterProcessor());
+                new RegisterProcessor(),
+                getContext().dispatcher());
     }
 
     @Override

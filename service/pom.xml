@@ -23,12 +23,12 @@
     </dependency>    
     <dependency>
       <groupId>com.typesafe.akka</groupId>
-      <artifactId>akka-actor</artifactId>
+      <artifactId>akka-actor_2.10</artifactId>
       <version>${akka.version}</version>
     </dependency>
     <dependency>
       <groupId>com.typesafe.akka</groupId>
-      <artifactId>akka-remote</artifactId>
+      <artifactId>akka-remote_2.10</artifactId>
       <version>${akka.version}</version>
     </dependency>
   </dependencies>
