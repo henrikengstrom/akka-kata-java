@@ -35,6 +35,13 @@ To compile the project with Maven:
 > mvn compile
 ```
 
+Since it is a multi-module project with dependencies between the modules you need to install the
+jar files in the local maven repository before running.
+
+```
+> mvn install
+```
+
 ## Eclipse the project
 
 See [Eclipse Guide](http://maven.apache.org/guides/mini/guide-ide-eclipse.html)
@@ -100,6 +107,8 @@ The final step is to retrieve the bets from the service
 > cd <project_home>/client
 > mvn exec:java -Dexec.mainClass="com.typesafe.akkademo.client.BetClient"
 ```
+
+Remember to clean out the _persistent store_ of bets in between runs of your system. It is stored in the file `persistent_store` in the top level project directory.
 
 That's it!
 
