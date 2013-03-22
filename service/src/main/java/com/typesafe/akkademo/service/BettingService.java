@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2011-2012 Typesafe <http://typesafe.com/>
+ *  Copyright (C) 2011-2013 Typesafe <http://typesafe.com/>
  */
 package com.typesafe.akkademo.service;
 
@@ -8,7 +8,7 @@ import akka.actor.Cancellable;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.util.Duration;
+import scala.concurrent.duration.Duration;
 import com.typesafe.akkademo.common.*;
 
 import java.util.HashMap;
@@ -32,7 +32,8 @@ public class BettingService extends UntypedActor {
                 Duration.create(5, SECONDS),
                 Duration.create(3, SECONDS),
                 getSelf(),
-                HANDLE_UNPROCESSED_BETS);
+                HANDLE_UNPROCESSED_BETS,
+                getContext().dispatcher());
     }
 
     @Override
