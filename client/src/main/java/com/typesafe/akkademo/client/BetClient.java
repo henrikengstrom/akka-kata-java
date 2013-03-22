@@ -1,14 +1,15 @@
 /**
- *  Copyright (C) 2011-2012 Typesafe, Inc <http://typesafe.com>
+ *  Copyright (C) 2011-2013 Typesafe, Inc <http://typesafe.com>
  */
 package com.typesafe.akkademo.client;
 
+import java.util.concurrent.TimeUnit;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.dispatch.Await;
-import akka.dispatch.Future;
 import akka.pattern.Patterns;
-import akka.util.Duration;
 import akka.util.Timeout;
 import com.typesafe.akkademo.common.Bet;
 import com.typesafe.akkademo.common.RetrieveBets;
@@ -44,7 +45,6 @@ public class BetClient {
                         "provider = \"akka.remote.RemoteActorRefProvider\" \n" +
                     "} \n"  +
                     "remote { \n" +
-                        "transport = \"akka.remote.netty.NettyRemoteTransport\" \n" +
                         "netty { \n" +
                             "hostname = \"127.0.0.1\" \n" +
                             "port = 2661 \n" +
@@ -64,7 +64,7 @@ public class BetClient {
 
     private void retrieveMessages(ActorSystem system) throws Exception {
         ActorRef service = getService(system);
-        Timeout timeout = new Timeout(Duration.parse("2 seconds"));
+        Timeout timeout = new Timeout(Duration.create(2, TimeUnit.SECONDS));
         Future<Object> fBets = Patterns.ask(service, new RetrieveBets(), timeout);
         List<Bet> bets = (List<Bet>) Await.result(fBets, timeout.duration());
         assert bets.size() == 200;
