@@ -23,7 +23,7 @@ Open a terminal and type:
 
 Open a browser and point it to:
 
-https://github.com/henrikengstrom/akka-kata-java/downloads
+https://github.com/henrikengstrom/akka-kata-java/archive/master.zip
 
 Select your preferred flavor of compression (zip or tar.gz), download and extract onto your machine.
 
